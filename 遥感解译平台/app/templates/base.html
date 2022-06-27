@@ -1,0 +1,69 @@
+<!DOCTYPE html> 
+<html>
+<head>
+   <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+   <script type="text/javascript" src="../static/marvinj-1.0.js"></script>
+  
+
+   <!----
+   进度条前端类库
+   -->
+
+</head>
+<style>
+
+   a{
+      color: aliceblue;
+      background-color: rgb(63, 44, 87);
+      font-size:larger;
+   }
+   body{
+      background-color: #000000;
+
+   }
+</style>
+
+<body> 
+
+<table width = "100%" style="background-color: #000000; border: 10px;">
+    <tr>
+       <td colspan = "2" >
+        
+<center>
+ <div id="main_nav" style="background-color: rgba(0, 0, 0, 0.509);color: aliceblue;">
+            遥感解译平台:
+            <a href="{{ url_for('home_map_ori') }}">主页</a>
+            <a href="#">目标提取</a>
+            <a href="#">变化检测</a>
+            <a href="#">地物检测</a>
+            <a href="#">地物分类</a>
+            <a href="{{ url_for('upload') }}">上传图片</a>
+            <a href="{{ url_for('logout') }}">登出</a>
+   </div>
+</center>
+        
+       </td>
+    </tr>
+
+    <tr valign = "top" >
+       <td width = "200px" height = "960px" style="background-color:#110323;">
+         {% block content %}{% endblock %}
+       </td>
+
+         <td width = "350px" height = "960px"><!----->
+            {% include '_imgpan.html' %}
+         </td>
+    </tr>
+    <tr>
+       <td colspan = "2" style="color: rgb(248, 248, 248);" >
+          <center>
+             遥感解译平台©2022.7
+          </center>
+       </td>
+    </tr>
+ </table>
+
+</body> 
+</html>
+
+

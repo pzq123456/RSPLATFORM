@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<head>
+    
+    {{ dropzone.load_css() }}
+    {{ dropzone.style('border: 2px dashed #0087F7; margin: 10%; min-height: 400px;') }}
+  
+
+</head>
+
+<body>
+   
+    {{ dropzone.create(action=url_for('upload'))}}
+   
+    {{ dropzone.load_js() }}
+    <!----
+    dropzone的配置文件必须要放在js后面
+    -->
+    {{ dropzone.config(max_files=2, timeout=10000, default_message='拖拽文件以上传!',allowed_file_type='image')}}
+</body>

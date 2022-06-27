@@ -1,0 +1,129 @@
+
+
+<!---
+消息提示区域：进度条及正在执行的算法
+
+-->
+
+
+<!---
+消息提示区域：end
+-->
+<h3 style="color: rgba(243, 240, 248, 0.517);">---------系统图片编号：{{post.id }}--------</h3>
+<br>
+<div id="progress{{post.id }}"></div>
+    <div style="background-color: #000000;">
+        <div style="background-color: #11033d;box-shadow: 0px 0px 5px rgba(255, 255, 255, 0.511);color: rgb(248, 242, 242);"></a>
+                <div style="background-color:rgb(15, 2, 43);">
+                    {% if post.body %}
+                    备注:{{ post.body }}
+                    {% endif %}
+
+                </div>
+                <img src="{{post.img_path}}" style="height: 200px;width: 200px;">
+<center>
+<div style="width: 70px;height: 30px;box-shadow: 0px 0px 20px rgba(255, 255, 255, 0.165);">
+    <a href="{{ url_for('home_map',img_id=post.id) }}" target="_Parent" style="color: #ebe8f0;">查看图片</a></div>
+</div>
+
+<div>
+
+    <!---
+        该div集成所有的算法
+    --->
+
+    <button id="start-bg-job" onclick="start_long_task('{{post.id}}')">地物分类</button>
+    <button id="cs" onclick="ceshi('{{post.id}}')">ceshi</button>
+
+</div>
+<script>
+    
+    function ceshi(id)
+    {
+        alert(id);
+    }
+
+</script>
+</center> 
+</div>
+            <h3 style="color: #f3effb71;">---图片上传时间：{{ moment(post.timestamp).fromNow() }}---</h3>
+</div>
+
+
+<script>
+    
+    function start_long_task(id) {
+        // add task status elements
+        div = $('<div class="progress">'+
+            '<div>'+'</div>'+
+            '<div>0%</div>'+
+            '<div>...</div>'+
+            '<div >&nbsp;</div>'+
+            '</div><hr>');
+        var progress_name="#progress"+id;
+
+        $(progress_name).append(div);
+
+        // create a progress bar
+        var nanobar = new Nanobar({
+            bg: '#44f',
+            classname:"real_bar",
+            target: div[0].childNodes[0]
+        });
+        // send ajax POST request to start background job
+        $.ajax({
+            type: 'POST',
+            url: '/classification/'+id, //请求地物分类接口
+            success: function(data, status, request) {
+                status_url = request.getResponseHeader('Location');
+                update_progress(status_url, nanobar, div[0]);
+            },
+            error: function() {
+                alert('Unexpected error');
+            }
+        });
+    }
+
+    function update_progress(status_url, nanobar, status_div) {
+        // send GET request to status URL
+        $.getJSON(status_url, function(data) {
+            // update UI
+            percent = parseInt(data['current'] * 100 / data['total']);
+            nanobar.go(percent);
+
+            $(status_div.childNodes[1]).text(percent + '%');
+            $(status_div.childNodes[2]).text(data['status']);
+
+            if (data['state'] != 'PENDING' && data['state'] != 'PROGRESS') {
+                if ('result' in data) {
+                    // show result
+                    $(status_div.childNodes[3]).text('Result: ' + data['result']);
+                    setTimeout(function() {
+                    $(status_div).remove()
+                }, 2000); //执行完成后则自动删除该元素
+                }
+                else {
+                    // something unexpected happened
+                    $(status_div.childNodes[3]).text('Result: ' + data['state']);
+                }
+            }
+            else {
+                // rerun in 2 seconds
+                setTimeout(function() {
+                    update_progress(status_url, nanobar, status_div);
+                }, 2000);
+            }
+        });
+    }
+//
+  //  $(function() {
+    //    $('#start-bg-job').click(start_long_task);
+    //});
+
+</script>
+
+<!---子模板 一次只渲染一条帖子-->
+
+
+
+
