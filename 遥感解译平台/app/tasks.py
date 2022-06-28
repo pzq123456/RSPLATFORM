@@ -31,9 +31,26 @@ def longtask():
                                                   task_id=task.id)}
 
 
-@app.route('/classification/<img_id>', methods=['POST']) # 地物分类任务接口
+@app.route('/classification/<img_id>', methods=['GET', 'POST']) # 地物分类任务接口
 def classification(img_id):
-    task = classification.apply_async(args=[img_id]) # 带参数
+    post=Post.query.filter_by(id=img_id).first_or_404()
+    img_path=post.img_path
+
+    fm0=img_path.split('.')
+    fm3=""
+    fm3=fm0[0]
+    fm1=fm3.split('/') # 提取图片名
+
+    filename=fm1[2]+"cla"+'.png' # 重写图片名 加上后缀cla表示地物分类的结果
+
+    img_path="./app/"+img_path# 相对于ai算法的路径
+
+    # 遥感影像
+    save_path_0 = "static/resultimg/"+filename # 相对于flask的相对路径
+    save_path_1 = "./app/"+"static/resultimg/"+filename # 相对于ai算法的
+
+    task = classification.apply_async(args=[img_id,img_path,save_path_0,save_path_1 ]) # 带参数
+
     return jsonify({}), 202, {'Location': url_for('classificationstatus',
                                                   task_id=task.id)}
 
@@ -100,6 +117,12 @@ def classificationstatus(task_id):
         }
         if 'result' in task.info:
             response['result'] = task.info['result']
+
+            # 放在此处存储
+            post = Post(author=current_user,img_path=task.info['result'],body=task.info['status'])
+            db.session.add(post)
+            db.session.commit()
+
     else:
         # something went wrong in the background job
         response = {
@@ -148,11 +171,10 @@ def long_task(self):
 
 
 @celery.task(bind=True) # 地物分类接口
-def classification(self,img_id):
-    img_id=int(img_id)
+def classification(self,img_id,img_path,save_path_0,save_path_1):
+    
     # 安慰剂 空循环 让ai算法看起来没有卡死
     message = '正在执行地物分类算法，请稍等……'
-
     for i in range(5):
         self.update_state(state='PROGRESS',
                           meta={'current': i, 'total': 100,
@@ -161,15 +183,13 @@ def classification(self,img_id):
     
 
     # 此处填入ai算法
-
-    img_path =Post.query.filter_by(id=img_id).first_or_404().img_path # 查询数据库 获取该图像的地址
+    #post=Post.query.filter_by(id=img_id).first_or_404() # 查询数据库 获取该图像的地址
+    #img_path=""
+    #img_path=post.img_path
     # 参考 图片路径格式
     # "static/userimg/"+filename 
-    fm=img_path.split('.')
-    filename=fm[0] # 提取图片名
-    filename=filename+"cla"+fm[1] # 重写图片名 加上后缀cla表示地物分类的结果
-    # 遥感影像
-    save_path = "static/resultimg/"+filename 
+
+    
 
     message = '核验结果是否存在，请稍等……'
     self.update_state(state='PROGRESS',
@@ -177,24 +197,19 @@ def classification(self,img_id):
                                 'status': message})
     time.sleep(2)
     
-    if not os.path.exists(save_path): # 不存在才会生成
-        run = predict_classification.Predict_classification(img_path,save_path)
+    if not os.path.exists(save_path_1): # 不存在才会生成
+        run = predict_classification.Predict_classification(img_path,save_path_1)
         run.Predict()
-        if not os.path.exists(save_path): # 不存在才会生成
+        if not os.path.exists(save_path_1): # 不存在才会生成
             run.Save() # 存储图片之前再检查一次 防止用户并发存储多次
-
-            post = Post(author=current_user,img_path= save_path,body=img_id+"号图片地物分类结果")
-            db.session.add(post)
-            db.session.commit()
-
             # ai算法装填完毕
             message = '载入并启动模型，请稍等……'
             # 当ai算法调用完成时 设定状态为85%
             self.update_state(state='PROGRESS',
                                 meta={'current': 85, 'total': 100,
                                         'status': message})
-            return {'current': 100, 'total': 100, 'status': '地物分类算法执行完成！',
-                'result': save_path} # 最后返回结果
+            return {'current': 100, 'total': 100, 'status': img_id+'号图片地物分类算法执行完成！',
+                'result': save_path_0} # 最后返回结果
         else :
             message = '并发存储，请不要多次点击该按钮……'
             # 当ai算法调用完成时 设定状态为85%
@@ -202,7 +217,7 @@ def classification(self,img_id):
                                 meta={'current': 85, 'total': 100,
                                         'status': message})
             return {'current': 100, 'total': 100, 'status': '算法执行失败，请勿多次连续点击！',
-                'result': save_path} # 最后返回结果
+                'result': save_path_0} # 最后返回结果
     else:
         message = '已存在该结果，请稍等……'
         self.update_state(state='PROGRESS',
@@ -211,7 +226,7 @@ def classification(self,img_id):
         time.sleep(2)
 
         return {'current': 100, 'total': 100, 'status': '已存在该结果，仔细查一查之前的结果吧！',
-                'result': save_path} # 最后返回结果
+                'result': save_path_0} # 最后返回结果
 
 
 # ======end============ #
