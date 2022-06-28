@@ -67,6 +67,7 @@ def home(): # 本页为左侧iframe
                 return redirect(url_for('home'))
 
     elif change_form.validate_on_submit(): # 变化检测表单
+
             current_posts=current_user.followed_posts().all()
             current_posts_id_list=[]
             for p in current_posts:
@@ -81,9 +82,11 @@ def home(): # 本页为左侧iframe
                 flash("请输入正确的图片编号！")
             else:
                 flash('变化检测开始!约一分钟后请手动刷新！')
+
                 #change_det.apply_async(args=[10, 20]) #调用后台任务
                 # 异步编程 在此处启动一个worker 但是不会自动刷新
                 # 执行完成后
+                
                 return redirect(url_for('home'))
     
 

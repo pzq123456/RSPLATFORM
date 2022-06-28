@@ -30,10 +30,12 @@
 
     <!---
         该div集成所有的算法
+        结果图片自动关闭功能按钮
     --->
-
-    <button id="start-bg-job" onclick="start_long_task('{{post.id}}')">地物分类</button>
-    <button id="cs" onclick="ceshi('{{post.id}}')">ceshi</button>
+        
+    {% if not post.body %}
+        {% include '_funbut.html' %}    
+    {% endif %}
 
 </div>
 <script>
@@ -52,8 +54,8 @@
 
 <script>
     
-    function start_long_task(id) {
-        
+
+    function start_long_task(id,taskname) {
         // add task status elements
         div = $('<div class="progress">'+
             '<div>'+'</div>'+
@@ -61,6 +63,7 @@
             '<div>...</div>'+
             '<div >&nbsp;</div>'+
             '</div><hr>');
+
         var progress_name="#progress"+id;
 
         $(progress_name).append(div);
@@ -74,7 +77,7 @@
         // send ajax POST request to start background job
         $.ajax({
             type: 'POST',
-            url: '/classification/'+id, //请求地物分类接口
+            url: '/'+taskname+'/'+id, //请求地物分类接口
             success: function(data, status, request) {
                 status_url = request.getResponseHeader('Location');
                 update_progress(status_url, nanobar, div[0]);
@@ -84,6 +87,7 @@
             }
         });
     }
+
 
     function update_progress(status_url, nanobar, status_div) {
         // send GET request to status URL
@@ -116,14 +120,15 @@
             }
         });
     }
-//
-  //  $(function() {
-    //    $('#start-bg-job').click(start_long_task);
-    //});
+
+
+
+
+
 
 </script>
 
-<!---子模板 一次只渲染一条帖子-->
+
 
 
 
