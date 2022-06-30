@@ -57,7 +57,17 @@
 
     function start_long_task(id,taskname) {
         // add task status elements
-        div = $('<div class="progress">'+
+        if(taskname=="change")
+        {
+            input=document.getElementById("last_img"+id);
+            if(input.value==""){
+                alert("请先输入后时相影像！")
+            }
+            else if(id==input.value){
+                alert("请勿对同一个影像执行变化检测！")
+            }
+            else{
+                div = $('<div class="progress">'+
             '<div>'+'</div>'+
             '<div>0%</div>'+
             '<div>...</div>'+
@@ -65,6 +75,44 @@
             '</div><hr>');
 
         var progress_name="#progress"+id;
+
+
+        $(progress_name).append(div);
+
+        // create a progress bar
+        var nanobar = new Nanobar({
+            bg: '#44f',
+            classname:"real_bar",
+            target: div[0].childNodes[0]
+        });
+
+        $.ajax({
+            type: 'POST',
+            url: '/'+taskname+'/'+id+'/'+input.value, //请求地物分类接口
+            success: function(data, status, request) {
+                status_url = request.getResponseHeader('Location');
+                update_progress(status_url, nanobar, div[0]);
+            },
+            error: function() {
+                alert('Unexpected error');
+            }
+        });
+
+
+        }
+
+        }
+
+        else{
+            div = $('<div class="progress">'+
+            '<div>'+'</div>'+
+            '<div>0%</div>'+
+            '<div>...</div>'+
+            '<div >&nbsp;</div>'+
+            '</div><hr>');
+
+        var progress_name="#progress"+id;
+
 
         $(progress_name).append(div);
 
@@ -75,7 +123,8 @@
             target: div[0].childNodes[0]
         });
         // send ajax POST request to start background job
-        $.ajax({
+        
+            $.ajax({
             type: 'POST',
             url: '/'+taskname+'/'+id, //请求地物分类接口
             success: function(data, status, request) {
@@ -86,6 +135,11 @@
                 alert('Unexpected error');
             }
         });
+
+        }
+        
+        
+       
     }
 
 

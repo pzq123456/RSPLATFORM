@@ -20,7 +20,7 @@ from collections import OrderedDict
 
 from hashlib import md5 # 生成MD5哈希值
 
-#from app.tasks import change_det
+from app.tasks import change
 
 
 # 注意：本webapp魔改自小队成员的webgis期末大作业 并非抄袭
@@ -45,8 +45,9 @@ def before_request():
 def home(): # 本页为左侧iframe
     form = PostForm()
     comment_form = CommentForm() # 实例化用户评论类
-    change_form = ChangeDETForm() # 实例化变化检测表单
 
+    change_form = ChangeDETForm() # 实例化变化检测表单
+    
     if form.validate_on_submit():
         post = Post(body=form.post.data, author=current_user,img_path=form.img_path.data)
         db.session.add(post)
@@ -65,35 +66,10 @@ def home(): # 本页为左侧iframe
                 db.session.commit()
                 flash('新建长备注成功!')
                 return redirect(url_for('home'))
-
-    elif change_form.validate_on_submit(): # 变化检测表单
-
-            current_posts=current_user.followed_posts().all()
-            current_posts_id_list=[]
-            for p in current_posts:
-                current_posts_id_list.append(p.id)
-            #获取所有该用户的图像编号 防止越界
-
-            if (change_form.img_1.data <=0 or change_form.img_1.data <=0 or 
-            change_form.img_1.data not in current_posts_id_list  or 
-            change_form.img_2.data <=0 or change_form.img_2.data <=0 or 
-            change_form.img_2.data not in current_posts_id_list
-            or change_form.img_1.data==change_form.img_2.data):
-                flash("请输入正确的图片编号！")
-            else:
-                flash('变化检测开始!约一分钟后请手动刷新！')
-
-                #change_det.apply_async(args=[10, 20]) #调用后台任务
-                # 异步编程 在此处启动一个worker 但是不会自动刷新
-                # 执行完成后
-                
-                return redirect(url_for('home'))
-    
-
     posts = current_user.followed_posts().all()
     follow_posts = Follow_Post.query.all()
     return render_template("home.html", title='主 页', form=form,
-                           posts=posts,follow_posts=follow_posts,comment_form =comment_form,change_form=change_form )
+                           posts=posts,follow_posts=follow_posts,comment_form =comment_form,change_form=change_form)
 
 
 
@@ -123,7 +99,7 @@ def login():
 @app.route('/logout')
 def logout():
     logout_user()
-    return redirect(url_for('home_map'))
+    return redirect(url_for('home_map_ori'))
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -386,6 +362,7 @@ def upload(): # 处理上传图片的函数
         db.session.add(post)
         db.session.commit()
     return render_template('dropzone.html')
+
 
 
 

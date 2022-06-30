@@ -6,14 +6,15 @@ import numpy as np
 class Predict_buiding_change:
 
     # 读取两时相影像
-    def __init__(self, img_path1, img_path2, save_path):
+    def __init__(self, img_path1, img_path2, save_path_1,save_path_2):
         img1 = cv2.imread(img_path1)
         img2 = cv2.imread(img_path2)
         self.img1 = cv2.resize(img1, (1024, 1024), interpolation=cv2.INTER_LINEAR)  # 将数据强制转换成1024 * 1024尺寸
         self.img2 = cv2.resize(img2, (1024, 1024), interpolation=cv2.INTER_LINEAR)
         self.img2 = cv2.imread(img_path2)
         self.predictor = pdrs.deploy.Predictor('aipro/inference_model_building') # 直接加载模型 相对路径
-        self.save_path = save_path
+        self.save_path_1 = save_path_1
+        self.save_path_2 = save_path_2
 
     # 将1024 * 1024的影像进行裁剪，得到一个包含16个256 * 256影像的列表
     def Crop_img(self, w, h):
@@ -95,7 +96,9 @@ class Predict_buiding_change:
         self.img_prob[int((h / 4) * 3):int((h / 4) * 4), int((w / 4) * 3):int((w / 4) * 4)] = self.pre_list[15]
 
     def Save_img(self):
-        cv2.imwrite(self.save_path, self.img_prob)
+        # 改 运行一次算法把结果存到两个地方
+        cv2.imwrite(self.save_path_1, self.img_prob)
+        cv2.imwrite(self.save_path_2, self.img_prob)
 
 '''
 if __name__ == '__main__':

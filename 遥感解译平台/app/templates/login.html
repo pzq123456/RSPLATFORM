@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<div style="background-color: #97a9d645; color :aliceblue;">
     <h1>登 录</h1>
     <form action="" method="post" novalidate>
         {{ form.hidden_tag() }}
@@ -19,4 +20,8 @@
         <p>{{ form.remember_me() }} {{ form.remember_me.label }}</p>
         <p>{{ form.submit() }}</p>
     </form>
-    <p>还没有注册？ <a href="{{ url_for('register') }}">点击此处注册!</a></p>
+    <p>还没有注册？ <a href="{{ url_for('register') }}" style="color: #eee2e2;">点击此处注册!</a></p>
+
+
+</div>
+    
