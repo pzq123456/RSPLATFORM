@@ -1,13 +1,22 @@
-<button id="start-bg-job" onclick="start_long_task('{{post.id}}','classification')">地物分类</button>
+<div style="background-color: #05042e; box-shadow: 0px 0px 10px #fcfbfb76;border-radius: 8px;">
+    <center>
+    <br>
+    <button id="start-bg-job" onclick="start_long_task('{{post.id}}','classification')">地物分类</button>
 <button id="start-bg-job" onclick="start_long_task('{{post.id}}','extract')">地物检测</button>
+<button id="start-bg-job" onclick="start_long_task('{{post.id}}','objectdet')">目标检测</button>
 <br>
 
     <label style="color: #fcfbfb;">后时相影像</label>
     <input id="last_img{{post.id}}" type="number"></input>
 
 <button  onclick="start_long_task('{{post.id}}','change')">开始变化检测</button>
+</center>
+</div>
 
 
 
 
-<button id="cs" onclick="ceshi('{{post.id}}')">ceshi</button>
+<!---
+<button id="cs" onclick="ceshi('{{post.id}}')" >ceshi</button>
+-->
+

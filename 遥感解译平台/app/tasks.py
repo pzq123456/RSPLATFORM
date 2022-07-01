@@ -9,7 +9,7 @@ from app import app
 from app import db
 from app.models import User,Post,Follow_Post
 
-from aipro import predict_classification,predict_building_change,predict_extract # 调用ai算法
+from aipro import predict_classification,predict_building_change,predict_extract,predict_object_detection# 调用ai算法
 from flask_login import current_user
 
 
@@ -69,6 +69,14 @@ def change(img_id_1,img_id_2):
         return jsonify({}), 202, {'Location': url_for('changestatus',
                                                   task_id=task.id)}
 
+
+@app.route('/objectdet/<img_id>', methods=['GET', 'POST']) # 目标检测任务接口
+def objectdet(img_id):
+    args=[]
+    args=img_path_parse(img_id,"obj")
+    task = objectdet.apply_async(args=args) # 带参数
+    return jsonify({}), 202, {'Location': url_for('objectdetstatus',
+                                                  task_id=task.id)}
 
 
 '''
@@ -165,6 +173,13 @@ def extractstatus(task_id):
 def changestatus(task_id):
     response=status_check(task_id)
     return jsonify(response)
+
+
+@app.route('/objectdetstatus/<task_id>') # 目标检测状态接口
+def objectdetstatus(task_id):
+    response=status_check(task_id)
+    return jsonify(response)
+
 
 # ======end============ #
 
@@ -356,6 +371,56 @@ def change(self,img_id_1,img_id_2,img_path_1,img_path_2,save_path_0,save_path_1,
         time.sleep(2)
         return {'current': 100, 'total': 100, 'status': '已存在该结果，请查一查与之相关联的结果吧！'}
 
+
+
+
+@celery.task(bind=True) # 地物检测接口
+def objectdet(self,img_id,img_path,save_path_0,save_path_1):
+    
+    # 安慰剂 空循环 让ai算法看起来没有卡死
+    message = '正在执行目标检测算法，请稍等……'
+    for i in range(5):
+        self.update_state(state='PROGRESS',
+                          meta={'current': i, 'total': 100,
+                                'status': message})
+        time.sleep(1)
+    
+    message = '核验结果是否已经存在，请稍等……'
+    self.update_state(state='PROGRESS',
+                          meta={'current': 20, 'total': 100,
+                                'status': message})
+    time.sleep(2)
+    
+    if not os.path.exists(save_path_1): # 不存在才会生成
+
+        run= predict_object_detection.Predict_object_detection(img_path,save_path_1)
+        run.Predict()
+        if not os.path.exists(save_path_1): # 不存在才会生成
+            run.Save() # 存储图片之前再检查一次 防止用户并发存储多次
+            # ai算法装填完毕
+            message = '载入并启动模型，请稍等……'
+            # 当ai算法调用完成时 设定状态为85%
+            self.update_state(state='PROGRESS',
+                                meta={'current': 85, 'total': 100,
+                                        'status': message})
+            return {'current': 100, 'total': 100, 'status': img_id+'号图片目标检测算法执行完成！',
+                'result': save_path_0} # 最后返回结果
+        else :
+            message = '并发存储，请不要多次点击该按钮……'
+            # 当ai算法调用完成时 设定状态为85%
+            self.update_state(state='PROGRESS',
+                                meta={'current': 85, 'total': 100,
+                                        'status': message})
+            return {'current': 100, 'total': 100, 'status': '算法执行失败，请勿多次连续点击！'}
+               # 'result': save_path_0} # 最后返回结果
+    else:
+        message = '已存在该结果，请稍等……'
+        self.update_state(state='PROGRESS',
+                          meta={'current': 20, 'total': 100,
+                                'status': message})
+        time.sleep(2)
+        return {'current': 100, 'total': 100, 'status': '已存在该结果，仔细查一查之前的结果吧！'}
+               # 'result': save_path_0} # 最后返回结果
 # ======end============ #
 
 

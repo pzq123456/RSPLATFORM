@@ -7,13 +7,19 @@
 
 </head>
 
-<body>
-   
+<body style="background-color: #090221;">
+    <a href="{{url_for('home_map_ori')}}" style="color: #fff6f6;font-size: xx-large;">《《返回《《</a>
     {{ dropzone.create(action=url_for('upload'))}}
    
     {{ dropzone.load_js() }}
     <!----
     dropzone的配置文件必须要放在js后面
     -->
-    {{ dropzone.config(max_files=2, timeout=10000, default_message='拖拽文件以上传!',allowed_file_type='image')}}
+    {{ dropzone.config(max_files=2, timeout=10000, default_message='拖拽文件以上传!',allowed_file_type='image',max_file_size=10)}}
 </body>
+<footer style="color: #fcf7f7;">
+    <center>
+        powered by paddlepaddle & paddleRS  <br>
+        R S I D A S ©2022.7 All rights reserved
+      </center>
+</footer>
