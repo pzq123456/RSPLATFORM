@@ -126,7 +126,7 @@ part_1非异步部分的运行步骤：<br>
   *如果您使用的是非VScode，请在“遥感解译平台”主文件夹处打开终端（windows--powershell、cmd、Unix--bash）首先设置flask参数，然后执行falsk的run命令。<br>
   （详见flask的官方文档）
  part_2异步部分运行步骤：本项目实现了异步并发操作（falsk原生不支持异步操作）。本项目借助celery库及Redis服务器实现异步项目，因而需要配置异步服务。<br>
-  1、首先请安装Redis服务器，详细教程见"https://Redis.org"。（推荐Unix系统使用，Redis原生不支持Windows，但是可以使用WSL2子系统运行Unix安装上Redis）<br>
+  1、首先请安装Redis服务器，详细教程见"https://Redis.org "。（推荐Unix系统使用，Redis原生不支持Windows，但是可以使用WSL2子系统运行Unix安装上Redis）<br>
   2、在app外部预先启动Redis服务器。<br>
   3、在终端中输入命令"celery -A app.celery worker --loglevel=info -P eventlet -c 10"启动celery服务。（同样是“遥感解译平台”大文件夹）<br>
  现在您已经成功启动项目了。如果启动失败，请在github上与我联系。如果觉得还不错欢迎给该项目点赞。<br>
