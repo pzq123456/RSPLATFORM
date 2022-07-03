@@ -26,28 +26,10 @@
 │  │      pipeline.yml<br>
 │  │<br>
 │  ├─inference_model_classification （注意：由于模型文件过大 github上传失败 请于百度网盘自提 请复制于该目录下 否则算法无法运行）<br>
-│  │      .success<br>
-│  │      model.pdiparams<br>
-│  │      model.pdiparams.info<br>
-│  │      model.pdmodel<br>
-│  │      model.yml<br>
-│  │      pipeline.yml<br>
 │  │<br>
 │  ├─inference_model_extract （注意：由于模型文件过大 github上传失败 请于百度网盘自提 请复制于该目录下 否则算法无法运行）<br>
-│  │      .success<br>
-│  │      model.pdiparams<br>
-│  │      model.pdiparams.info<br>
-│  │      model.pdmodel<br>
-│  │      model.yml<br>
-│  │      pipeline.yml<br>
 │  │<br>
 │  ├─inference_model_object_detection （注意：由于模型文件过大 github上传失败 请于百度网盘自提 请复制于该目录下 否则算法无法运行）<br>
-│        .success<br>
-│        model.pdiparams<br>
-│        model.pdiparams.info<br>
-│        model.pdmodel<br>
-│        model.yml<br>
-│        pipeline.yml<br>
 │  <br>
 │<br>
 ├─app（这里是软件的主体部分）<br>
