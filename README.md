@@ -51,7 +51,6 @@
 │  │  │      <br>
 │  │  │<br>
 │  │  └─userimg/略<br>
-|  |<br>
 │  │<br>
 │  ├─templates(略 主要是html文件)<br>
 │  <br>
